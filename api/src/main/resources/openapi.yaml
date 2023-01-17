@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: "One Time Password"
+  description: "Сервис предназначен для генерации, хранения и проверки одноразовых кодов (One Time Password)"
+  version: "1.0"
+  contact:
+    name: "One Time Password API"
+    url: "https://openweathermap.org/api"
+    email: "nikitkuts@gmail.com"
+servers:
+  - url: https://api.openweathermap.org/data/2.5/ 
+paths:
+  /OTPGeneration:
+    post:
+      tags: 
+      - Current One Time Pawssword Data
+      description: "Метод по запросу генерирует и возвращает одноразовый пароль"
+      operationId: GenerateOPT
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: Successful response, OPT was generated 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResponse'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Weather not found
+                type: string
+                example: Not found
+  /OTPCheck:
+    post:
+      tags: 
+        - Current One Time Pawssword Data
+      description: "Метод проверяет корректность ОТР"
+      operationId: Check OTP
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/OTP'
+      responses:
+        200:
+          description: Successful response, OPT was generated 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResponse'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Weather not found
+                type: string
+                example: Not found
+         
+  /OTPDelete:
+    delete:
+      tags: 
+        - Current One Time Pawssword Data
+      description: "Метод проверяет корректность ОТР"
+      operationId: delete OTP
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/OTP'
+      responses:
+        200:
+          description: Successful response, OPT was generated 
+          content:
+            application/json:
+              schema:
+                title: OTP was successfully deleted
+                type: string
+        204:
+          description: No content
+          content:
+            text/plain:
+              schema:
+                title: OTP not found
+                type: string
+security:
+    - app_id: []
+tags:
+- name: Current One Time Pawssword Data
+  description: "Get current weather details"
+                
+components:
+  parameters:
+    id:
+      name: id
+      in: query
+      description: "Идентификатор(строка с произвольным содержимым)"
+      required: true
+      schema:
+        type: string
+        
+    OTP:
+      name: OTP
+      in: query
+      description: "One Time Password"
+      required: true
+      schema:
+        type: object
+        
+  schemas:
+    GenerateResponse:
+      title: Successful response
+      type: object
+      properties:
+        id:
+          type: string
+          description: Идентификатор
+        
+        OTP:
+          type: object
+          description: One Time Password
+          
+        OTPLifetime:
+          type: string
+          description: датf + время, до какого этот код действителен
+          
+    CheckResponse:
+      title: Отображает состояние кода
+      type: object
+      properties:
+        id:
+          type: string
+          description: Идентификатор
+        
+        status:
+          type: object
+          description:  Enum {a.  SUCCESS – переданный на проверку код совпадает с правильным, и его время жизни еще не истекло; b.  EXPIRED – код истёк, при этом его корректность не имеет значения; c.  FAILED – передан неверный код (при этом срок жизни кода ещё не истёк)}
+
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests. If you don't have an OpenWeatherMap API key, use `fd4698c940c6d1da602a70ac34f0b147`.
+      name: appid
+      in: query
+    
+    
